@@ -75,23 +75,31 @@ export async function listenOnNewListings(sniperUrl: string) {
         .replace(`42["newCoinCreated",`, "")
         .replace("]", "");
       let coin = NewCoinCreatedSchema.parse(JSON.parse(jsonParsable));
-      console.log({
+      const msg = {
         mint: coin.mint,
         x: coin.twitter,
         at: new Date(coin.created_timestamp).toLocaleString(),
         current: new Date().toLocaleString(),
-      });
+      };
+      console.debug(msg);
+      // logs might be skipped to see later if that brings speed
+      // improvement, both rust and ts service
+      if (msg.at !== msg.current) {
+        // red X emoji in the log for skip
+        console.debug("❌Too late");
+      }
       // skip if token doesnt have telegram or twitter
       // there is so many tokens, I might just filter like this
       if (!coin.website || !coin.telegram || !coin.twitter) {
-        console.log("No telegram or twitter or website, skipping");
+        console.debug("❌No telegram or twitter or website, skipping");
         return;
       }
       // check if set of the three is not a single element
       if (new Set([coin.website, coin.telegram, coin.twitter]).size === 1) {
-        console.log("Website, telegram and twitter are the same, skipping");
+        console.debug("❌Website, telegram and twitter are the same, skipping");
         return;
       }
+      console.debug("✅Token has telegram, twitter and website, on time too!");
       const pumpBuyRequest: PumpBuyRequest = {
         mint: coin.mint,
         bonding_curve: coin.bonding_curve,
