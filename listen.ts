@@ -81,6 +81,10 @@ export async function listenOnNewListings(sniperUrl: string) {
         at: new Date(coin.created_timestamp).toLocaleString(),
         current: new Date().toLocaleString(),
       });
+      if (!coin.telegram) {
+        console.log("No telegram, skipping");
+        return;
+      }
       const pumpBuyRequest: PumpBuyRequest = {
         mint: coin.mint,
         bonding_curve: coin.bonding_curve,
