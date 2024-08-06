@@ -61,7 +61,7 @@ export async function listenOnTrades() {
   };
 }
 
-export async function listenOnNewListings() {
+export async function listenOnNewListings(sniperUrl: string) {
   const ws = new WebSocket(PUMP_WEBSOCKET_URL);
   _addBaseHandlers(ws);
 
@@ -90,7 +90,7 @@ export async function listenOnNewListings() {
         real_token_reserves: String(coin.real_token_reserves),
         real_sol_reserves: String(coin.real_sol_reserves),
       };
-      fetch("http://localhost:6969/pump-buy", {
+      fetch(`${sniperUrl}/pump-buy`, {
         headers: {
           "Content-Type": "application/json",
         },

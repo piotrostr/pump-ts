@@ -25,11 +25,12 @@ program
 
 program
   .command("listen")
+  .option("--sniper-url <url>", "sniper url", "http://sniper:6969")
   .description("Listen for new listings")
   .action(async () => {
     console.log("Listening for new listings");
     try {
-      await listenOnNewListings();
+      await listenOnNewListings(program.opts().sniper);
     } catch (error) {
       console.error(error);
     }
@@ -42,6 +43,21 @@ program
     console.log("Listening for new trades");
     try {
       await listenOnTrades();
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+program
+  .command("health")
+  .description("check if the pump service is healthy")
+  .option("--sniper-url <url>", "sniper url", "http://sniper:6969")
+  .action(async () => {
+    try {
+      const sniperUrl = program.opts().sniper;
+      const res = await fetch(`${sniperUrl}/health`);
+      const data = await res.json();
+      console.log(data);
     } catch (error) {
       console.error(error);
     }
