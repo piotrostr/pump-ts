@@ -90,15 +90,18 @@ export async function listenOnNewListings(sniperUrl: string) {
         real_token_reserves: String(coin.real_token_reserves),
         real_sol_reserves: String(coin.real_sol_reserves),
       };
-      fetch(`${sniperUrl}/pump-buy`, {
+      const url = `${sniperUrl}/pump-buy`;
+      fetch(url, {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         body: JSON.stringify(pumpBuyRequest),
-      });
-      // close after a buy (testing)
-      // ws.close();
+      })
+        .then((_) => {})
+        .catch((error) => {
+          console.error(url, error);
+        });
     }
   };
 }
