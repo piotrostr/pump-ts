@@ -81,8 +81,15 @@ export async function listenOnNewListings(sniperUrl: string) {
         at: new Date(coin.created_timestamp).toLocaleString(),
         current: new Date().toLocaleString(),
       });
-      if (!coin.telegram) {
-        console.log("No telegram, skipping");
+      // skip if token doesnt have telegram or twitter
+      // there is so many tokens, I might just filter like this
+      if (!coin.website || !coin.telegram || !coin.twitter) {
+        console.log("No telegram or twitter or website, skipping");
+        return;
+      }
+      // check if set of the three is not a single element
+      if (new Set([coin.website, coin.telegram, coin.twitter]).size === 1) {
+        console.log("Website, telegram and twitter are the same, skipping");
         return;
       }
       const pumpBuyRequest: PumpBuyRequest = {
