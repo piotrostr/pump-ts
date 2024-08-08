@@ -35,6 +35,7 @@ program.command("listen-logs").action(async () => {
     new PublicKey("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"),
     (logs, context) => {
       console.log({
+        signature: logs.signature,
         onSlot: context.slot,
         currentSlot,
         window: context.slot - currentSlot,
@@ -44,6 +45,17 @@ program.command("listen-logs").action(async () => {
   );
   conn.onSlotChange((slot) => {
     currentSlot = slot.slot;
+  });
+});
+
+program.command("listen-slot").action(async () => {
+  if (!process.env.RPC_URL) {
+    console.error("RPC_URL environment variable is required");
+    return;
+  }
+  const conn = new Connection(process.env.RPC_URL);
+  conn.onSlotChange((slot) => {
+    console.log(slot.slot);
   });
 });
 
