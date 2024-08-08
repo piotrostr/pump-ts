@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { listenOnNewListings, listenOnTrades } from "./listen";
 import { grabToken } from "./token";
+import { Connection, Commitment, LogsFilter, PublicKey } from "@solana/web3.js";
 
 const program = new Command();
 
@@ -22,6 +23,36 @@ program
       console.error("Error grabbing token:", error);
     }
   });
+
+program.command("listen-logs").action(async () => {
+  if (!process.env.RPC_URL) {
+    console.error("RPC_URL environment variable is required");
+    return;
+  }
+  const conn = new Connection(process.env.RPC_URL);
+  conn.onLogs(
+    new PublicKey("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"),
+    (logs, context) => {
+      console.log(context);
+    },
+    "processed",
+  );
+});
+
+program.command("listen-program").action(async () => {
+  if (!process.env.RPC_URL) {
+    console.error("RPC_URL environment variable is required");
+    return;
+  }
+  const conn = new Connection(process.env.RPC_URL);
+  conn.onProgramAccountChange(
+    new PublicKey("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"),
+    (acc) => {
+      console.log(acc);
+    },
+    { commitment: "processed" },
+  );
+});
 
 program
   .command("listen")
@@ -62,6 +93,21 @@ program
       console.error(error);
     }
   });
+
+program.command("bench-pumpportal").action(async () => {
+  const ws = new WebSocket("wss://pumpportal.fun/api/data");
+
+  ws.onopen = () => {
+    // Subscribing to token creation events
+    let payload = {
+      method: "subscribeNewToken",
+    };
+    ws.send(JSON.stringify(payload));
+  };
+  ws.onmessage = (event) => {
+    console.log(JSON.parse(event.data)?.mint, Date.now());
+  };
+});
 
 await (async function main() {
   await program.parseAsync(process.argv);

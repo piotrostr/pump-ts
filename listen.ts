@@ -83,10 +83,11 @@ export async function listenOnNewListings(sniperUrl: string) {
         at: new Date(coin.created_timestamp).toLocaleString(),
         current: new Date().toLocaleString(),
       };
-      console.debug(msg);
+      console.debug(Date.now(), msg);
       console.debug(
-        `got info ${Date.now() - coin.created_timestamp} ms after creation`,
+        `got the msg in ${Date.now() - coin.created_timestamp} ms after creation`,
       );
+      return;
       // logs might be skipped to see later if that brings speed
       // improvement, both rust and ts service
       if (msg.at !== msg.current) {
