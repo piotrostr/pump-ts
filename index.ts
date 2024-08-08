@@ -29,14 +29,22 @@ program.command("listen-logs").action(async () => {
     console.error("RPC_URL environment variable is required");
     return;
   }
+  let currentSlot = 0;
   const conn = new Connection(process.env.RPC_URL);
   conn.onLogs(
     new PublicKey("TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM"),
     (logs, context) => {
-      console.log(context);
+      console.log({
+        onSlot: context.slot,
+        currentSlot,
+        window: context.slot - currentSlot,
+      });
     },
     "processed",
   );
+  conn.onSlotChange((slot) => {
+    currentSlot = slot.slot;
+  });
 });
 
 program.command("listen-program").action(async () => {
