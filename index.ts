@@ -125,7 +125,22 @@ program.command("bench-pumpportal").action(async () => {
     ws.send(JSON.stringify(payload));
   };
   ws.onmessage = (event) => {
-    console.log(JSON.parse(event.data)?.mint, Date.now());
+    let gotItAt = Date.now();
+    let data = JSON.parse(event.data);
+    console.log(data);
+    const url = "https://frontend-api.pump.fun/coins/" + data.mint;
+    // sleep for a second
+    setTimeout(() => {
+      fetch(url, {
+        headers: { accept: "application/json" },
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res);
+          console.log("diff: " + (res.created_timestamp - gotItAt));
+        });
+    }, 1000);
   };
 });
 
